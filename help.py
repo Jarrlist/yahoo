@@ -106,23 +106,20 @@ def totalCash(ticket):
 def getEBITDA(ticket):
     # Tror amortization är fel
     try:
-        netIncome = ticket.financials.loc['Net Income'][0:3]
-        intreset = np.abs(ticket.financials.loc['Interest Expense'][0:3])
-        tax = np.abs(ticket.financials.loc['Income Tax Expense'][0:3])
-        depreciation = np.abs(ticket.cashflow.loc['Depreciation'][0:3])
-        amortization = np.zeros(3)
-        amortization[0] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][0])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1]))
-        amortization[1] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2]))
-        amortization[2] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][3]))
+        netIncome = ticket.financials.loc['Net Income']
+        intreset = np.abs(ticket.financials.loc['Interest Expense'])
+        
+        opProfit = ticket.financials.loc["Operating Income"]
+        netIncome = ticket.financials.loc['Net Income']
+        tax = np.abs(ticket.financials.loc['Income Tax Expense'])
+        Da = np.abs((opProfit - netIncome - tax)/2)
+
 
     except:
         print (colored("WARNING, EBITDA could not be calculated", 'yellow'))
         return float('N/A'), float("NaN")
-    EBITDA = netIncome + intreset + tax + depreciation + amortization
-    margin = sum(EBITDA/getRevenue(ticket)[1][0:3])/len(EBITDA)
+    EBITDA = netIncome + intreset + tax + Da
+    margin = sum(EBITDA/getRevenue(ticket)[1])/len(EBITDA)
     return EBITDA[0], margin
 
 def getGrossProfit(ticket):
@@ -153,46 +150,43 @@ def getInterestCost(ticket, debt=1):
     return interest[0], margin/debt
 
 def getDAtoCapex(ticket):
-    # Tror amortization är fel. Enligt Investiopedia ska man dela 
-    # A&D/CapEx. Men detta blir ofta fel. Rätt ofta blir det > 1
-    # och det blir även negativ ibland. 
-    # Provat det mesta, har bara gissat det senaste 
+    # Ny ide 
+    # opProfit = Eb - interest - DA
+    # Da = opProfit - Eb + interest
+    # Eb = netIncome + intreset + tax + depreciation + amortization
+    # 2*Da = opProfit - netIncome - tax
     try:
-        capEx = np.abs(ticket.cashflow.loc["Capital Expenditures"][0:3])
-        dep = np.abs(ticket.cashflow.loc["Depreciation"][0:3])
-        amortization = np.zeros(3)
-        amortization[0] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][0])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1]))
-        amortization[1] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2]))
-        amortization[2] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][3]))
-    except:
-        print (colored("WARNING, D&A could not be calculated", 'yellow'))
+        capEx = np.abs(ticket.cashflow.loc["Capital Expenditures"])
+        opProfit = ticket.financials.loc["Operating Income"]
+        netIncome = ticket.financials.loc['Net Income']
+        tax = np.abs(ticket.financials.loc['Income Tax Expense'])
+        Da = np.abs((opProfit - netIncome - tax)/2)
+        margin = np.abs(Da/(capEx + Da))
+    except: 
+        print (colored("WARNING, D&A could not be calculated (get)", 'yellow'))
         return float("NaN")
-    margin = sum((dep-amortization)/(capEx+dep-amortization))/len(capEx)
-    if (margin > 1) or (margin < 0):
-        print (colored("WARNING, D&A prob wrong not be calculated", 'yellow'))
-        margin = 0.8
-    return margin
+    if math.isnan(sum(margin)):
+        print (colored("WARNING, D&A could not be calculated (NaN)", 'yellow'))
+        return float("NaN")
+
+    avgRatio = sum(margin)/len(margin)
+    return avgRatio
 
 def getCapex(ticket):
     # Läs getDAtoCapex ....
     try:
-        capEx = np.abs(ticket.cashflow.loc["Capital Expenditures"][0:3])
-        dep = np.abs(ticket.cashflow.loc["Depreciation"][0:3])
-        amortization = np.zeros(3)
-        amortization[0] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][0])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1]))
-        amortization[1] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][1])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2]))
-        amortization[2] = (np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][2])
-                        - np.abs(ticket.balance_sheet.loc['Net Tangible Assets'][3]))
+        capEx = np.abs(ticket.cashflow.loc["Capital Expenditures"])
+        
+        opProfit = ticket.financials.loc["Operating Income"]
+        netIncome = ticket.financials.loc['Net Income']
+        tax = np.abs(ticket.financials.loc['Income Tax Expense'])
+        Da = np.abs((opProfit - netIncome - tax)/2)
+
     except:
         print (colored("WARNING, CapEx could not be calculated", 'yellow'))
         return float("NaN"), float("NaN")
-    cap = capEx + dep + amortization
-    margin = sum(cap/getRevenue(ticket)[1][0:3])/len(capEx)
+    cap = capEx + Da
+    margin = sum(cap/getRevenue(ticket)[1])/len(capEx)
     return capEx[0], margin
 
 def getWorkingCapital(ticket):

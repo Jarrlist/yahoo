@@ -135,6 +135,7 @@ def intrinsic2(ticket):
 
     capEx, capExMargin = help.getCapex(ticket)
 
+
     DAratio = help.getDAtoCapex(ticket)
     operationProfit = Ebitda - interest - DAratio*capEx
     operationProfitMargin = operationProfit/revenue
@@ -142,10 +143,6 @@ def intrinsic2(ticket):
     tax, taxMargin = help.getTax(ticket)
     # net working capital senare
     cwc, wcMargin = help.getWorkingCapital(ticket)
-
-    #print("Ebit: " + str(EbitdaMargin))
-    #print(grossMargin)
-    #print("overhead: " + str(corporateOverheadMargin))
 
     everything = (price + outStanding + debt + cash + revenue + growth 
                 + grossProfit + grossMargin + Ebitda + EbitdaMargin 
@@ -158,7 +155,7 @@ def intrinsic2(ticket):
     for i in range(years-1):
         rev = np.power(1+growth, i+1) * revenue
         gross = rev*grossMargin
-        corp = rev*corporateOverhead
+        corp = rev*corporateOverheadMargin
         Eb = rev*EbitdaMargin
         interest = debt*interestToDebt
         cap = rev*capExMargin
@@ -175,6 +172,16 @@ def intrinsic2(ticket):
     FutureEnterprice = sum(FCF)
     futureEquity = FutureEnterprice - debt + cash
     targetSharePrice = futureEquity/outStanding
+
+    print("grossMargin: " + f'{np.round(grossMargin,2):,}')
+    print("corporateOverheadMargin: " + f'{np.round(corporateOverheadMargin,2):,}')
+    print("EbitdaMargin: " + f'{np.round(EbitdaMargin,2):,}')
+    print("interestToDebt: " + f'{np.round(interestToDebt,2):,}')
+    print("capExMargin: " + f'{np.round(capExMargin,2):,}')
+    print("DAratio: " + f'{np.round(DAratio,2):,}')
+    print("wcMargin: " + f'{np.round(wcMargin,2):,}')
+    print("taxMargin: " + f'{np.round(taxMargin,2):,}')
+    print("UFCF: " + f'{np.round(FCF[0],2):,}')
 
     print("Instrinsic value: " + f'{np.round(targetSharePrice,2):,}')  
     if(price > targetSharePrice):
