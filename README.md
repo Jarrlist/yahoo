@@ -3,9 +3,9 @@ The result is then illustrated.
 
 To run the program:
 
-1: Install python and all packages required
+1: Install python and all packages required, pip install -r requirements.txt
 
-2: To run program type "python main.py"
+2: To run program type: python main.py
 
 3: The GUI will be displayed. 
 

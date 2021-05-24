@@ -1,0 +1,7 @@
+yfinance
+numpy
+matplotlib
+termcolor
+emoji
+math
+PySimpleGUI

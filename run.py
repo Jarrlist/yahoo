@@ -12,7 +12,7 @@ import dcf
 import help
 import fileHandeler
 
-class runData:
+class RunData:
     name = []
     beta = []
     var = []
@@ -71,7 +71,7 @@ def runCompany(tickerName, debug = False):
 def runFile(filename, runBlacklist=False):
     companies = fileHandeler.load(filename, runBlacklist)
 
-    info = runData()
+    info = RunData()
     i = 0
     for i, company in enumerate(companies):
         info.add(*runCompany(company))

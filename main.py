@@ -2,13 +2,10 @@ import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('seaborn-whitegrid')
-import numpy as np
-import colorsys
 from termcolor import colored
 import emoji
 import math
 import PySimpleGUI as sg
-import os.path
 
 import dcf
 import help
