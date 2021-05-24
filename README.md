@@ -4,7 +4,9 @@ The result is then illustrated.
 To run the program:
 
 1: Install python and all packages required
+
 2: To run program type "python main.py"
+
 3: The GUI will be displayed. 
 
 Run a single company by entering the yahoo ticket in the "run stock" field, then press "GO". 
