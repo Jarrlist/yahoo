@@ -8,13 +8,16 @@ from termcolor import colored
 import emoji
 import math
 
-import method1
-import method2
+import dcf
 import help
 import fileHandeler
 
+# Run parameters
 filename = 'companies.txt'
 runBlackList = False
+debug = False
+
+
 companies = fileHandeler.load(filename, runBlackList)
 
 data = np.zeros((len(companies), 2))
@@ -53,7 +56,7 @@ for i, company in enumerate(companies):
     marker.append(markerTemp)
     color[i] = help.PE(msft)
     #method1.evaluate(msft)
-    data[i], DCFSucess[i] = method2.intrinsic2(msft)
+    data[i], DCFSucess[i] = dcf.intrinsic(msft, debug)
 
 area = np.log10((np.power(beta,10) + np.power(var,10) )*10000)
 area[area < 1] = 1

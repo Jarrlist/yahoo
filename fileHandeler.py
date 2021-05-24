@@ -40,7 +40,7 @@ def save(filename, companies, blacklistedCompanies):
     file.truncate(0)
     file.close()
     with open(blacklist, 'w') as filehandle:
-        for listitem in companies:
+        for listitem in blacklistedCompanies:
             filehandle.write('%s\n' % listitem)
 
     # Remove duplicates in blacklist
@@ -53,4 +53,6 @@ def save(filename, companies, blacklistedCompanies):
     with open(blacklist, 'w') as filehandle:
         for listitem in blacklistedCompanies:
             filehandle.write('%s\n' % listitem)
+
+    
     
