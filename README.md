@@ -2,6 +2,7 @@ The program takes down data from yahoo finance and performs DCF.
 The result is then illustrated. 
 
 To run the program:
+
 1: Install python and all packages required
 2: To run program type "python main.py"
 3: The GUI will be displayed. 
