@@ -7,92 +7,54 @@ import colorsys
 from termcolor import colored
 import emoji
 import math
+import PySimpleGUI as sg
+import os.path
 
 import dcf
 import help
 import fileHandeler
+import run
 
 # Run parameters
 filename = 'companies.txt'
 runBlackList = False
 debug = False
 
+file_list_column = [
+    [
+        sg.Text("Run Stock: "),
+        sg.In(size=(10, 1), enable_events=True, key="-TICKET-"),
+        sg.Button("GO", key="-GO_TICKET-"),
+    ],
+    [
+        sg.Text("Run File: "),
+        sg.In(size=(50, 1), enable_events=True, key="-FILE-"),
+        sg.FileBrowse(),
+        sg.Button("GO", key="-GO_FILE-"),
+    ],
+    [
+        sg.Text("Run Defualt File: "),
+        sg.Checkbox('Run Blacklist:', default=False, key="-BLACKLIST-"),
+        sg.Button("GO", key="-GO_DEFUALT-"), 
+    ],
 
-companies = fileHandeler.load(filename, runBlackList)
+]
 
-data = np.zeros((len(companies), 2))
-beta = np.zeros(len(companies))
-var = np.zeros(len(companies))
-color = np.zeros(len(companies))
-DCFSucess = np.zeros(len(companies))
-fscore = np.zeros(len(companies))
-marker = []
-name = []
-i = 0
-for i, company in enumerate(companies):
-    
-    msft = yf.Ticker(company)
-    try:
-        print(colored("=============>  ", 'magenta') + str(msft.info['website'][11:-3]) + "(" + company + ")" + colored(" <=====  ", 'magenta'))
-        name.append(str(msft.info['website'][11:-3])) 
-    except: 
-        print("=============  " + company + " ===============")
-        name.append(company) 
-    try:
-        beta[i] = msft.info['beta']
-        if (math.isnan(beta[i])):
-            beta[i] = 1
-    except: 
-        beta[i] = 1
-    gro, var[i], growthSuccess = help.growth(msft.financials.loc['Total Revenue'])
+layout = [
+    [
+        sg.Column(file_list_column),
+    ]
+]
 
-    if(gro < 0):    
-        print("Revenue Growth: " + colored(str(round(100*gro, 2 )) + "%  ", 'red'))
-    elif(gro < 0.05):
-        print("Revenue Growth: " + colored(str(round(100*gro, 2 )) + "%", 'blue'))
-    else:
-        print("Revenue Growth: " + colored(str(round(100*gro, 2 )) + "% ", 'green') + emoji.emojize(':rocket:'))
-    fscore[i], markerTemp =  help.Fscore(msft)
-    marker.append(markerTemp)
-    color[i] = help.PE(msft)
-    #method1.evaluate(msft)
-    data[i], DCFSucess[i] = dcf.intrinsic(msft, debug)
+window = sg.Window("Image Viewer", layout)
 
-area = np.log10((np.power(beta,10) + np.power(var,10) )*10000)
-area[area < 1] = 1
-area*=40
-
-# Filtering
-filteredData = data[np.logical_and(DCFSucess == 1, color < 100)]
-filteredColor = color[np.logical_and(DCFSucess == 1, color < 100)]
-filteredArea = area[np.logical_and(DCFSucess == 1, color < 100)]
-filteredScore = fscore[np.logical_and(DCFSucess == 1, color < 100)]
-filteredMarker = []
-filteredName = []
-filteredCompanies = []
-blacklistedCompanies = []
-
-for i, n in enumerate(name):
-    if(DCFSucess[i] and (color[i] < 100)):
-        filteredName.append(n)
-        filteredMarker.append(marker[i])
-        filteredCompanies.append(companies[i])
-    else:
-        blacklistedCompanies.append(companies[i])
-
-fileHandeler.save(filename, companies, blacklistedCompanies)
-
-fig, ax = plt.subplots()
-sc = ax.scatter(np.asarray(filteredData[:,0]), 100*np.asarray(filteredData[:,1]), 
-        c=filteredColor, s=filteredArea, alpha=0.3, cmap='jet')
-plt.title("DCF, assuming 10'%' annual return, year 1-5: current growth, 6-10: current growth/2 ")
-plt.xlabel("Cheap To Expensive (1 = Fair Value)")
-plt.ylabel("Growth In Percent")
-plt.vlines(1, -10, 50, color="red")
-plt.hlines(0, 0, 3, color="red")
-for i, txt in enumerate(filteredName):
-    ax.annotate(filteredCompanies[i].partition(".")[0] , (np.asarray(filteredData[i,0]), 100*np.asarray(filteredData[i,1]) +0.5), ha='center' )
-    ax.annotate(str(round(filteredScore[i])), (np.asarray(filteredData[i,0]), 100*np.asarray(filteredData[i,1]) ), ha='center', va='center')
-cbar = fig.colorbar(sc, ax=ax, orientation="vertical")
-cbar.ax.set_xlabel('P/E - Ratio')
-plt.show()
+while True:
+    event, values = window.read()
+    if event == "Exit" or event == sg.WIN_CLOSED:
+        break
+    elif event == "-GO_TICKET-":
+        run.runCompany(values["-TICKET-"])
+    elif event == "-GO_FILE-":
+        run.runFile(values["-FILE-"])
+    elif event == "-GO_DEFUALT-":
+        run.runFile(filename, values["-BLACKLIST-"])
