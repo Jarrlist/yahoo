@@ -3,7 +3,6 @@ import numpy as np
 from termcolor import colored
 import matplotlib.pyplot as plt
 import math
-from sklearn.linear_model import LinearRegression
 
 
 def growth(arr):
@@ -11,16 +10,26 @@ def growth(arr):
         print (colored("WARNING, growth input NAN, cant't calculate growth!", 'yellow'))
         return 0, 0, False
 
+    if(len(arr) == 1): 
+        print (colored("WARNING, No growth data", 'yellow'))
+        return 0, 0, False
+
     growth = 0
     sum = 0
     for x in range(len(arr)-1):
+        if(arr[x+1] == 0): 
+            print (colored("WARNING, No growth data", 'yellow'))
+            return 0, 0, False
         temp = (arr[x]/arr[x+1]) 
         if ((temp < 0.3) or temp > 2.5 ):
             print (colored("WARNING, CHANGE Growth!", 'yellow'))
         else:
             growth = growth + temp
-            sum += 1
+            sum = sum + 1
 
+    if(sum == 0): 
+        print (colored("WARNING, No growth data", 'yellow'))
+        return 0, 0, False
     avarageGrowth = growth/sum 
     return (avarageGrowth - 1), 0, True
 
@@ -28,11 +37,17 @@ def PE(ticket):
     try:
         pe = ticket.info['trailingPE']
         if(math.isnan(pe)):
-            print (colored("WARNING, Revenue NaN! Setting it to 99", 'yellow'))
-            pe = 99
+            print (colored("WARNING, P/e NaN! calculating from financials", 'yellow'))
+            price = ticket.info['open']*ticket.info['sharesOutstanding']
+            earnings = ticket.Earnings.values[0]
+            pe = price/earnings
     except:
         pe = 99
-        print (colored("WARNING, Revenue NaN! Setting it to 99", 'yellow'))
+        print (colored("WARNING, Could not find p/e Setting it to 99", 'yellow'))
+
+    if(math.isnan(pe) or pe == 0):
+        pe = 99
+        print (colored("WARNING, Could not find p/e Setting it to 99", 'yellow'))
 
     if(pe < 30):
         print("Trailing P/E: " + colored(str(round(pe,2)), 'green'))
@@ -60,15 +75,22 @@ def getOutstanding(ticket):
     try:
         outstanding = ticket.info['sharesOutstanding']
     except:
-        print (colored("WARNING, outstanding price unaviable", 'yellow'))
+        print (colored("WARNING, outstanding unaviable", 'yellow'))
         return float("NaN")
-        outstanding = 1
+    if (outstanding == 0):
+        print (colored("WARNING, outstanding unaviable", 'yellow'))
+        return float("NaN")
+
     return outstanding   
 
 def getRevenue(ticket):
     try: 
         revenue = ticket.financials.loc['Total Revenue']
     except:
+        print (colored("WARNING, Revenue could not be calculated", 'yellow'))
+        return float("NaN"), float("NaN"), float("NaN")
+
+    if(np.any(revenue == 0)):
         print (colored("WARNING, Revenue could not be calculated", 'yellow'))
         return float("NaN"), float("NaN"), float("NaN")
     gro,_,_ = growth(revenue)
@@ -80,8 +102,13 @@ def getDebt(ticket):
         sharholderEqt = ticket.balance_sheet.loc['Total Stockholder Equity'][0]
         totalDebt = totalLiab - sharholderEqt
     except:
-        print (colored("WARNING, outstanding price unaviable", 'yellow'))
+        print (colored("WARNING, Debt unaviable", 'yellow'))
         return float("NaN")
+
+    if(totalLiab == 0):
+        print (colored("WARNING, Debt unaviable", 'yellow'))
+        return float("NaN")
+
     return totalDebt
 
 def totalCash(ticket):
@@ -101,6 +128,10 @@ def totalCash(ticket):
             short = 0
     except:
         short = 0
+
+    if(cash == 0):
+        return float("NaN")
+    
     return cash + short
 
 def getEBITDA(ticket):
@@ -116,9 +147,13 @@ def getEBITDA(ticket):
 
 
     except:
-        print (colored("WARNING, EBITDA could not be calculated", 'yellow'))
-        return float('N/A'), float("NaN")
+        print (colored("WARNING, EBITDA not aviable, can not be calculated", 'yellow'))
+        return float("NaN"), float("NaN")
     EBITDA = netIncome + intreset + tax + Da
+    if(math.isnan(sum(EBITDA))):
+        print (colored("WARNING, EBITDA contained NaN value, can not be calculated", 'yellow'))
+        return float("NaN"), float("NaN")
+
     margin = sum(EBITDA/getRevenue(ticket)[1])/len(EBITDA)
     return EBITDA[0], margin
 

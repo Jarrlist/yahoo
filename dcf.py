@@ -68,6 +68,7 @@ def intrinsic(ticket, debug=False):
                 + interest + interestToDebt + capEx + capExMargin
                 + DAratio + tax + taxMargin + cwc + wcMargin)
     if(math.isnan(everything)):
+        print(colored("WARNING: SOME VALUE WAS NaN", 'yellow' ))
         return [0,0], False
 
     FCF = np.zeros(years)
@@ -93,16 +94,13 @@ def intrinsic(ticket, debug=False):
     targetSharePrice = futureEquity/outStanding
 
     if debug:
-        print("grossMargin: " + f'{np.round(grossMargin,2):,}')
-        print("corporateOverheadMargin: " + f'{np.round(corporateOverheadMargin,2):,}')
-        print("EbitdaMargin: " + f'{np.round(EbitdaMargin,2):,}')
-        print("interestToDebt: " + f'{np.round(interestToDebt,2):,}')
-        print("capExMargin: " + f'{np.round(capExMargin,2):,}')
-        print("DAratio: " + f'{np.round(DAratio,2):,}')
-        print("wcMargin: " + f'{np.round(wcMargin,2):,}')
-        print("taxMargin: " + f'{np.round(taxMargin,2):,}')
-        print("UFCF: " + f'{np.round(FCF[0],2):,}')
-
+        for line in [["gross", "Overhead", "Ebitda", "interest", "CapEx", "DAratio", "wcMargin", "tax"], 
+                        [f'{np.round(grossMargin,2):,}' , f'{np.round(corporateOverheadMargin,2):,}' , 
+                f'{np.round(EbitdaMargin,2):,}' , f'{np.round((debt*interestToDebt)/revenue,2):,}'
+                , f'{np.round(capExMargin,2):,}' , f'{np.round(DAratio,2):,}' 
+                , f'{np.round(wcMargin,2):,}' , f'{np.round(taxMargin,2):,}']]:
+            print('{:>0} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*line))
+        
     print("Instrinsic value: " + f'{np.round(targetSharePrice,2):,}')  
     if(price > targetSharePrice):
         print ("Current ask price: " + colored(f'{round(price,2):,}', 'red'))  

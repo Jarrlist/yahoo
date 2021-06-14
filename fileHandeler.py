@@ -5,14 +5,15 @@ plt.style.use('seaborn-whitegrid')
 import numpy as np
 import colorsys
 
-blacklist = 'blacklistedCompanies.txt'
+blacklist = 'companies-blacklist.txt'
 
 def load(filename, runBlackList=False):
+    blacklist = filename[:-4] + "-blacklist.txt"
     with open(filename) as f:
         companiesRead = f.read().splitlines()
 
     if (runBlackList):
-        with open(blacklist) as f:
+        with open(blacklist, 'w+') as f:
             blackCompaniesRead = f.read().splitlines()
         # Remove duplicates
         companies = list(dict.fromkeys(companiesRead + blackCompaniesRead))
@@ -29,6 +30,7 @@ def load(filename, runBlackList=False):
     return companies
 
 def save(filename, companies, blacklistedCompanies):
+    blacklist = filename[:-4] + "-blacklist.txt"
     file = open(filename,"r+")
     file.truncate(0)
     file.close()
@@ -36,10 +38,10 @@ def save(filename, companies, blacklistedCompanies):
         for listitem in companies:
             filehandle.write('%s\n' % listitem)
 
-    file = open(blacklist,"r+")
+    file = open(blacklist,"a+")
     file.truncate(0)
     file.close()
-    with open(blacklist, 'w') as filehandle:
+    with open(blacklist, 'w+') as filehandle:
         for listitem in blacklistedCompanies:
             filehandle.write('%s\n' % listitem)
 
@@ -50,7 +52,7 @@ def save(filename, companies, blacklistedCompanies):
     file = open(blacklist,"r+")
     file.truncate(0)
     file.close()
-    with open(blacklist, 'w') as filehandle:
+    with open(blacklist, 'w+') as filehandle:
         for listitem in blacklistedCompanies:
             filehandle.write('%s\n' % listitem)
 

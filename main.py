@@ -27,11 +27,12 @@ file_list_column = [
         sg.Text("Run File: "),
         sg.In(size=(50, 1), enable_events=True, key="-FILE-"),
         sg.FileBrowse(),
+        sg.Checkbox('Run Blacklist:', default=False, key="-BLACKLIST_1-"),
         sg.Button("GO", key="-GO_FILE-"),
     ],
     [
         sg.Text("Run Defualt File: "),
-        sg.Checkbox('Run Blacklist:', default=False, key="-BLACKLIST-"),
+        sg.Checkbox('Run Blacklist:', default=False, key="-BLACKLIST_2-"),
         sg.Button("GO", key="-GO_DEFUALT-"), 
     ],
 
@@ -43,7 +44,7 @@ layout = [
     ]
 ]
 
-window = sg.Window("Image Viewer", layout)
+window = sg.Window("Jarrlist's DCF Calculator", layout)
 
 while True:
     event, values = window.read()
@@ -52,6 +53,6 @@ while True:
     elif event == "-GO_TICKET-":
         run.runCompany(values["-TICKET-"])
     elif event == "-GO_FILE-":
-        run.runFile(values["-FILE-"])
+        run.runFile(values["-FILE-"], values["-BLACKLIST_1-"])
     elif event == "-GO_DEFUALT-":
-        run.runFile(filename, values["-BLACKLIST-"])
+        run.runFile(filename, values["-BLACKLIST_2-"])

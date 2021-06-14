@@ -36,7 +36,7 @@ class RunData:
         self.data.append(data)
         self.DCFSuccess.append(DCFSucess) 
 
-def runCompany(tickerName, debug = False):
+def runCompany(tickerName, debug = True):
     msft = yf.Ticker(tickerName)
     try:
         print(colored("=============>  ", 'magenta') +
@@ -52,6 +52,8 @@ def runCompany(tickerName, debug = False):
     except:
         beta = 1
     gro, var, growthSuccess = help.growth(msft.financials.loc['Total Revenue'])
+    if(growthSuccess == False):
+        return "NaN", 0, 0, False, 0, "NaN", 0, [0,0], False
 
     if(gro < 0):
         print("Revenue Growth: " + colored(str(round(100*gro, 2)) + "%  ", 'red'))
@@ -72,41 +74,41 @@ def runFile(filename, runBlacklist=False):
     companies = fileHandeler.load(filename, runBlacklist)
 
     info = RunData()
-    i = 0
-    for i, company in enumerate(companies):
+    for _, company in enumerate(companies):
         info.add(*runCompany(company))
 
-    area = np.log10((np.power(info.beta, 10) + np.power(info.var, 10))*10000)
-    area[area < 1] = 1
-    area *= 40
-
     # Filtering
-    dcfMask = np.array(info.DCFSuccess) == 1
-    peMask = np.array(info.pe) < 100
+    dcfMask = np.array(info.DCFSuccess, dtype=object) == 1
+    peMask = np.array(info.pe, dtype=object) < 100
     mask = np.logical_and(dcfMask, peMask)
     
-    filteredData = np.array(info.data)[mask]
-    filteredColor = np.array(info.pe)[mask]
-    filteredArea = np.array(area)[mask]
-    filteredScore = np.array(info.fscore)[mask]
+    filteredData = np.array(info.data, dtype=object)[mask,:]
+    print(np.array(info.data, dtype=object))
+    filteredColor = np.array(info.pe, dtype=object)[mask]
+    filteredScore = np.array(info.fscore, dtype=object)[mask]
     filteredMarker = []
     filteredName = []
     filteredCompanies = []
     blacklistedCompanies = []
 
     for i, n in enumerate(info.name):
-        if(info.DCFSuccess[i] and (info.pe[i] < 100)):
+        if(mask[i]):
             filteredName.append(n)
             filteredMarker.append(info.fScoreMarker[i])
             filteredCompanies.append(companies[i])
         else:
             blacklistedCompanies.append(companies[i])
-
     fileHandeler.save(filename, companies, blacklistedCompanies)
+
+    #area = np.log10((np.power(info.beta, 10) + np.power(info.var, 10))*10000)
+    #area[area < 1] = 1
+    #area *= 40
+
+    print(filteredData.shape)
 
     fig, ax = plt.subplots()
     sc = ax.scatter(np.asarray(filteredData[:, 0]), 100*np.asarray(filteredData[:, 1]),
-                    c=filteredColor, s=filteredArea, alpha=0.3, cmap='jet')
+                    c=filteredColor, alpha=0.3, cmap='jet')
     plt.title("DCF, assuming 10'%' annual return, year 1-5: current growth, 6-10: current growth/2 ")
     plt.xlabel("Cheap To Expensive (1 = Fair Value)")
     plt.ylabel("Growth In Percent")
