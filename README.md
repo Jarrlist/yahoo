@@ -44,3 +44,7 @@ Known issues and future improvments
 8. More advanced methods for forcasting growth and margins. For now it is just avarages from recent years. 
 
 9. Maybe factor in divedens, and it's date, in a more usefull way.    
+
+
+
+If you are interested in helping out in this project, or if you have found bugs, contact me! Jarrlist@gmail.com
