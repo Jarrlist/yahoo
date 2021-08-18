@@ -1,3 +1,9 @@
+## WARNING
+The program relies heavily on the yfinance API. Unfortunally yfinance changes it behavior from time to time, somtimes a update of yfinance solves the problem. Somtimes it totaly breaks the program, and then some of the code base needs some rewriten. If it dose not work, this might be the reason. 
+
+## Description
+
+
 The program takes down data from yahoo finance and performs DCF. 
 The result is then printed in the terminal and illustrated if a file is choosen. 
 
