@@ -1,6 +1,8 @@
 ## WARNING
 The program relies heavily on the yfinance API. Unfortunally yfinance changes it behavior from time to time, somtimes a update of yfinance solves the problem. Somtimes it totaly breaks the program, and then some of the code base needs to be rewritten. If it dose not work, this might be the reason. 
 
+The program should not be trusted compleatly when investing. I did this script mainly to learn more about the yfinance API and evaluation. It is meant more as a filter, by esing the process of finding promesing companies. Always do your own research before investing. 
+
 ## Description
 
 
