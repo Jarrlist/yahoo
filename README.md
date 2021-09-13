@@ -22,6 +22,8 @@ The valuation will then be displayed in terminal.
 separated with row breaks. select the file using "Browse" and hit "GO" to run the file. When 
 all companies are valuated, a plot will display them. 
 
+![image info](./Images/DCFv2.png)
+
 3.3: The defualt file is "companies.txt", to run this file hit "GO" on the third row. 
 The file "companies.txt" can be modified, and the choice of defualt file can easily 
 be changed in the main script "main.py".

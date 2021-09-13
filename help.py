@@ -5,7 +5,13 @@ import matplotlib.pyplot as plt
 import math
 
 
-def growth(arr):
+def growth(ticket):
+    try:
+        arr = ticket.financials.loc['Total Revenue']
+    except: 
+        print (colored("WARNING, Cant get revenue", 'yellow'))
+        return 0, 0, False
+
     if(math.isnan(np.sum(arr))): 
         print (colored("WARNING, growth input NAN, cant't calculate growth!", 'yellow'))
         return 0, 0, False
@@ -164,6 +170,9 @@ def getGrossProfit(ticket):
         print (colored("WARNING, Gross Profit could not be calculated", 'yellow'))
         return float("NaN"), float("NaN")
     margin = sum(grossProfit/getRevenue(ticket)[1])/len(grossProfit)
+    if (math.isnan(margin) or (math.isnan(sum(grossProfit)))):
+        print (colored("WARNING, Gross Profit could not be calculated", 'yellow'))
+        return float("NaN"), float("NaN")
     return grossProfit[0], margin
 
 def getTax(ticket):

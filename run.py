@@ -51,7 +51,7 @@ def runCompany(tickerName, debug = True):
             beta = 1
     except:
         beta = 1
-    gro, var, growthSuccess = help.growth(msft.financials.loc['Total Revenue'])
+    gro, var, growthSuccess = help.growth(msft)
     if(growthSuccess == False):
         return "NaN", 0, 0, False, 0, "NaN", 0, [0,0], False
 
@@ -74,7 +74,8 @@ def runFile(filename, runBlacklist=False):
     companies = fileHandeler.load(filename, runBlacklist)
 
     info = RunData()
-    for _, company in enumerate(companies):
+    for i, company in enumerate(companies):
+        print ("(" + str(i+1) + "/" + str(len(companies)) + ")    "),
         info.add(*runCompany(company))
 
     # Filtering
@@ -83,7 +84,6 @@ def runFile(filename, runBlacklist=False):
     mask = np.logical_and(dcfMask, peMask)
     
     filteredData = np.array(info.data, dtype=object)[mask,:]
-    print(np.array(info.data, dtype=object))
     filteredColor = np.array(info.pe, dtype=object)[mask]
     filteredScore = np.array(info.fscore, dtype=object)[mask]
     filteredMarker = []
@@ -104,7 +104,7 @@ def runFile(filename, runBlacklist=False):
     #area[area < 1] = 1
     #area *= 40
 
-    print(filteredData.shape)
+    #print(filteredData.shape)
 
     fig, ax = plt.subplots()
     sc = ax.scatter(np.asarray(filteredData[:, 0]), 100*np.asarray(filteredData[:, 1]),

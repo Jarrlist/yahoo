@@ -94,12 +94,13 @@ def intrinsic(ticket, debug=False):
     targetSharePrice = futureEquity/outStanding
 
     if debug:
-        for line in [["gross", "Overhead", "Ebitda", "interest", "CapEx", "DAratio", "wcMargin", "tax"], 
+        for line in [["gross", "Overhead", "Ebitda", "interest", "CapEx", "DAratio", "wcMargin", "tax", "UFCF"], 
                         [f'{np.round(grossMargin,2):,}' , f'{np.round(corporateOverheadMargin,2):,}' , 
                 f'{np.round(EbitdaMargin,2):,}' , f'{np.round((debt*interestToDebt)/revenue,2):,}'
                 , f'{np.round(capExMargin,2):,}' , f'{np.round(DAratio,2):,}' 
-                , f'{np.round(wcMargin,2):,}' , f'{np.round(taxMargin,2):,}']]:
-            print('{:>0} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*line))
+                , f'{np.round(wcMargin,2):,}' , f'{np.round(taxMargin,2):,}', 
+                f'{np.round(FCF[0]/revenue,2):,}']]:
+            print('{:>0} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}'.format(*line))
         
     print("Instrinsic value: " + f'{np.round(targetSharePrice,2):,}')  
     if(price > targetSharePrice):
