@@ -51,7 +51,10 @@ def runCompany(tickerName, debug = True):
             beta = 1
     except:
         beta = 1
-    gro, var, growthSuccess = help.growth(msft)
+    try:
+        gro, var, growthSuccess = help.growth(msft)
+    except:
+        return "NaN", 0, 0, False, 0, "NaN", 0, [0,0], False
     if(growthSuccess == False):
         return "NaN", 0, 0, False, 0, "NaN", 0, [0,0], False
 

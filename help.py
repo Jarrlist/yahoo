@@ -3,14 +3,17 @@ import numpy as np
 from termcolor import colored
 import matplotlib.pyplot as plt
 import math
+import time
 
 
-def growth(ticket):
-    try:
-        arr = ticket.financials.loc['Total Revenue']
+def growth(msft):
+    try: 
+        a = 1
     except: 
         print (colored("WARNING, Cant get revenue", 'yellow'))
         return 0, 0, False
+
+    arr = msft.financials.loc['Total Revenue']
 
     if(math.isnan(np.sum(arr))): 
         print (colored("WARNING, growth input NAN, cant't calculate growth!", 'yellow'))
@@ -22,22 +25,27 @@ def growth(ticket):
 
     growth = 0
     sum = 0
-    for x in range(len(arr)-1):
-        if(arr[x+1] == 0): 
+    try: 
+        for x in range(len(arr)-1):
+            if(arr[x+1] == 0): 
+                print (colored("WARNING, No growth data", 'yellow'))
+                return 0, 0, False
+            temp = (arr[x]/arr[x+1]) 
+            if ((temp < 0.3) or temp > 2.5 ):
+                print (colored("WARNING, CHANGE Growth!", 'yellow'))
+            else:
+                growth = growth + temp
+                sum = sum + 1
+
+        if(sum == 0): 
             print (colored("WARNING, No growth data", 'yellow'))
             return 0, 0, False
-        temp = (arr[x]/arr[x+1]) 
-        if ((temp < 0.3) or temp > 2.5 ):
-            print (colored("WARNING, CHANGE Growth!", 'yellow'))
-        else:
-            growth = growth + temp
-            sum = sum + 1
-
-    if(sum == 0): 
-        print (colored("WARNING, No growth data", 'yellow'))
+        avarageGrowth = growth/sum 
+        return (avarageGrowth - 1), 0, True
+    except:
+        print (colored("WARNING, Cant get revenue", 'yellow'))
         return 0, 0, False
-    avarageGrowth = growth/sum 
-    return (avarageGrowth - 1), 0, True
+
 
 def PE(ticket):
     try:
@@ -99,7 +107,7 @@ def getRevenue(ticket):
     if(np.any(revenue == 0)):
         print (colored("WARNING, Revenue could not be calculated", 'yellow'))
         return float("NaN"), float("NaN"), float("NaN")
-    gro,_,_ = growth(revenue)
+    gro,_,_ = growth(ticket)
     return revenue[0], revenue, gro
 
 def getDebt(ticket): 
