@@ -38,23 +38,24 @@ def save(filename, companies, blacklistedCompanies):
         for listitem in companies:
             filehandle.write('%s\n' % listitem)
 
-    file = open(blacklist,"a+")
-    file.truncate(0)
-    file.close()
-    with open(blacklist, 'w+') as filehandle:
-        for listitem in blacklistedCompanies:
-            filehandle.write('%s\n' % listitem)
+    if blacklistedCompanies:
+        file = open(blacklist,"a+")
+        file.truncate(0)
+        file.close()
+        with open(blacklist, 'w+') as filehandle:
+            for listitem in blacklistedCompanies:
+                filehandle.write('%s\n' % listitem)
 
     # Remove duplicates in blacklist
-    with open(blacklist) as f:
-        companiesRead = f.read().splitlines()
-    blacklistedCompanies = list(dict.fromkeys(companiesRead))
-    file = open(blacklist,"r+")
-    file.truncate(0)
-    file.close()
-    with open(blacklist, 'w+') as filehandle:
-        for listitem in blacklistedCompanies:
-            filehandle.write('%s\n' % listitem)
+        with open(blacklist) as f:
+            companiesRead = f.read().splitlines()
+        blacklistedCompanies = list(dict.fromkeys(companiesRead))
+        file = open(blacklist,"r+")
+        file.truncate(0)
+        file.close()
+        with open(blacklist, 'w+') as filehandle:
+            for listitem in blacklistedCompanies:
+                filehandle.write('%s\n' % listitem)
 
     
     

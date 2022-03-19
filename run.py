@@ -36,7 +36,7 @@ class RunData:
         self.data.append(data)
         self.DCFSuccess.append(DCFSucess) 
 
-def runCompany(tickerName, debug = True):
+def runCompany(tickerName, debug = True, single=False):
     msft = yf.Ticker(tickerName)
     try:
         print(colored("=============>  ", 'magenta') +
@@ -70,6 +70,11 @@ def runCompany(tickerName, debug = True):
     marker = markerTemp
     pe = help.PE(msft)
     data, DCFSucess = dcf.intrinsic(msft, debug)
+
+    if (DCFSucess and (single==True)):
+        companies = fileHandeler.load('companies.txt', False)
+        companies.append(tickerName)
+        fileHandeler.save('companies.txt', companies, [])
 
     return name, beta, var, growthSuccess, fscore, marker, pe, data, DCFSucess
 

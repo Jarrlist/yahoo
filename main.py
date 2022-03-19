@@ -21,6 +21,7 @@ file_list_column = [
     [
         sg.Text("Run Stock: "),
         sg.In(size=(10, 1), enable_events=True, key="-TICKET-"),
+        sg.Checkbox('Add to defualt:', default=True, key="-ADD-"),
         sg.Button("GO", key="-GO_TICKET-"),
     ],
     [
@@ -51,7 +52,7 @@ while True:
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
     elif event == "-GO_TICKET-":
-        run.runCompany(values["-TICKET-"])
+        run.runCompany(values["-TICKET-"], single=values["-ADD-"])
     elif event == "-GO_FILE-":
         run.runFile(values["-FILE-"], values["-BLACKLIST_1-"])
     elif event == "-GO_DEFUALT-":
